@@ -33,8 +33,9 @@ jobs:
         env:
           VITE_APP_VERSION: ${{ steps.version.outputs.version }}
           VITE_GIT_COMMIT: ${{ github.sha }}
-          VITE_BUILD_DATE: ${{ github.run_started_at }}
-        run: npm run build
+        run: |
+          export VITE_BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          npm run build
 
       - uses: actions/upload-pages-artifact@v3
         with:
