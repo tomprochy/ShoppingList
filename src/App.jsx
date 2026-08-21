@@ -1,3 +1,5 @@
+import VersionInfo from './version';
+
 function App() {
   return (
     <main className="app-container">
