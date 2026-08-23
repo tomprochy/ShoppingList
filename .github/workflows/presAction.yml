@@ -1,0 +1,11 @@
+name: Manual Repository Name Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  print-repo-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vypiš název repozitáře
+        run: echo "Název repozitáře je ${{ github.repository }}"
