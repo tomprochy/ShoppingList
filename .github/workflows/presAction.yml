@@ -8,4 +8,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Vypiš název repozitáře
-        run: echo "Název repozitáře je ${{ github.repository }}"
+        run: echo "Název repozitáře je ${{ github.repository }} a ref je ${{ github.ref_name }}."
