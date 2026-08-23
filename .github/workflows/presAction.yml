@@ -1,11 +1,27 @@
-name: Manual Repository Name Check
+name: Manual Run with Summary
 
 on:
   workflow_dispatch:
 
 jobs:
-  print-repo-name:
+  build-and-summary:
     runs-on: ubuntu-latest
     steps:
-      - name: Vypiš název repozitáře
-        run: echo "Název repozitáře je ${{ github.repository }} a ref je ${{ github.ref_name }}."
+      - name: Vygeneruj hezké Run Summary
+        run: |
+          echo "## 🚀 Přehled spuštění workflow" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Spuštěno uživatelem **${{ github.actor }}** v repozitáři \`${{ github.repository }}\`." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Detaily spuštění" >> $GITHUB_STEP_SUMMARY
+          echo "| Parametr | Hodnota |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Cílová větev** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit SHA** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **ID běhu** | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Stav** | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details><summary>🔍 Klikni pro zobrazení podrobností</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Tato sekce využívá HTML tag **details** pro schování dlouhého textu nebo logů." >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
