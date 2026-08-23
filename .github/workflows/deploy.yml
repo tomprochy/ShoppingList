@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 permissions:
   contents: read
@@ -17,8 +17,6 @@ concurrency:
 
 jobs:
   build:
-    # Běží pouze pokud jde o ruční spuštění NEBO pokud pushnutý tag směřuje do větve master
-    if: github.event_name == 'workflow_dispatch' || github.ref_name == 'master'
     runs-on: ubuntu-latest
 
     steps:
