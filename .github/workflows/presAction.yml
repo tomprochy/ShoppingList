@@ -8,10 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Node version before setup
-        run: node --version
+        run: |
+          echo "## Node version before setup" >> $GITHUB_STEP_SUMMARY
+          node --version >> $GITHUB_STEP_SUMMARY
 
       - name: Current date
-        run: date
+        run: |
+          echo "## Current date" >> $GITHUB_STEP_SUMMARY
+          date >> $GITHUB_STEP_SUMMARY
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -19,4 +23,6 @@ jobs:
           node-version: 20
 
       - name: Node version after setup
-        run: node --version
+        run: |
+          echo "## Node version after setup" >> $GITHUB_STEP_SUMMARY
+          node --version >> $GITHUB_STEP_SUMMARY
