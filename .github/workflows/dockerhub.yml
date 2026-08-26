@@ -98,7 +98,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.prod
+          file: ./Dockerfile.test
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage:1.0.0
