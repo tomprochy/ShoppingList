@@ -45,6 +45,46 @@ jobs:
             type=raw,value=latest
             type=sha,format=short
 
+      # 5b. Výpis načtených a zapisovaných metadat do Job Summary
+      - name: Print Docker metadata to Summary
+        run: |
+          IMAGE_NAME="${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage"
+          
+          echo "## 🐳 Docker Metadata Summary" >> $GITHUB_STEP_SUMMARY
+          
+          # --- NAČTENÁ METADATA Z DOCKER HUBU ---
+          echo "### 📥 Aktuální stav na Docker Hubu (před pushem)" >> $GITHUB_STEP_SUMMARY
+          echo "Načítám existující tagy z Docker Hubu pro \`$IMAGE_NAME\`..." >> $GITHUB_STEP_SUMMARY
+          
+          # Dotaz na v1 API Docker Hubu pro získání seznamu tagů
+          HTTP_STATUS=$(curl -s -o tags_response.json -w "%{http_code}" "https://registry.hub.docker.com/v2/repositories/$IMAGE_NAME/tags/")
+          
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "**Existující tagy v repozitáři:**" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            jq '.results[] | {name: .name, last_updated: .last_updated, digest: .digest}' tags_response.json >> $GITHUB_STEP_SUMMARY || cat tags_response.json >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ *Nepodařilo se načíst existující tagy (repozitář ještě neexistuje nebo je privátní).* Status: $HTTP_STATUS" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # --- GENERUJANÁ METADATA PRO ZÁPIS ---
+          echo "### 📤 Metadata připravená k zápisu na Docker Hub" >> $GITHUB_STEP_SUMMARY
+          echo "**Sestavené Docker Tagy:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          
+          echo "**Vygenerované Docker Label: **" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.labels }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+          echo "**Kompletní JSON metadata z \`docker/metadata-action\`:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          echo '${{ steps.meta.outputs.json }}' | jq . >> $GITHUB_STEP_SUMMARY || echo '${{ steps.meta.outputs.json }}' >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
       # 6. Build Docker image a nahrání (Push) do Docker Hubu
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
