@@ -93,3 +93,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage:1.0.0
+            ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage:1.0
+            ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage:latest
