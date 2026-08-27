@@ -10,5 +10,8 @@ Push s verzí (v1.0.0) se deployuje automaticky a přidává číslo verze+lates
 Pozor - pro doručení tagu z vscode na github jsem musel tagy extra pushovat. S commitem tam nešel.
 git push origin v0.0.12   
 
+dockerhub akce provede build a pošle image do repository - pokud je s verzí tak se po pushi automatick naleje
+pokud je to build bez verze tak se musí nalít přes action ručním spuštěním a shaXXX buildu se propíše jako verze
+
 - autentikace přes google
 - data ze suprabase
