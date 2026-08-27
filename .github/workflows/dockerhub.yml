@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*.*.*'
+      - '*.*.*'
 
 jobs:
   build-and-push:
@@ -23,7 +26,6 @@ jobs:
           cache: 'npm'
 
       # 2b. Nastavení environment proměnné VITE_APP_VERSION z package.json
-      # 2b. Nastavení environment proměnné VITE_APP_VERSION z package.json
       - name: Set VITE_APP_VERSION from package.json
         run: echo "VITE_APP_VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
 
@@ -40,57 +42,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 5. Extrakce metadat (tagy jako 'latest' a SHA hash)
+      # 5. Dynamická extrakce metadat a tagů
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage
           tags: |
+            # Pokud push obsahuje Git tag (např. v1.0.0), použije se jako verze
+            type=semver,pattern={{version}}
+            # Pokud push NENÍ Git tag, vytvoří se short SHA (např. sha-2f08af3)
+            type=sha,format=short,enable=${{ !startsWith(github.ref, 'refs/tags/') }}
+            # Tag 'latest' se přidá vždy
             type=raw,value=latest
-            type=sha,format=short
 
-      # 5b. Výpis načtených a zapisovaných metadat do Job Summary
-      - name: Print Docker metadata to Summary
-        run: |
-          IMAGE_NAME="${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage"
-          
-          echo "## 🐳 Docker Metadata Summary" >> $GITHUB_STEP_SUMMARY
-          
-          # --- NAČTENÁ METADATA Z DOCKER HUBU ---
-          echo "### 📥 Aktuální stav na Docker Hubu (před pushem)" >> $GITHUB_STEP_SUMMARY
-          echo "Načítám existující tagy z Docker Hubu pro \`$IMAGE_NAME\`..." >> $GITHUB_STEP_SUMMARY
-          
-          # Dotaz na v1 API Docker Hubu pro získání seznamu tagů
-          HTTP_STATUS=$(curl -s -o tags_response.json -w "%{http_code}" "https://registry.hub.docker.com/v2/repositories/$IMAGE_NAME/tags/")
-          
-          if [ "$HTTP_STATUS" -eq 200 ]; then
-            echo "**Existující tagy v repozitáři:**" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
-            jq '.results[] | {name: .name, last_updated: .last_updated, digest: .digest}' tags_response.json >> $GITHUB_STEP_SUMMARY || cat tags_response.json >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ *Nepodařilo se načíst existující tagy (repozitář ještě neexistuje nebo je privátní).* Status: $HTTP_STATUS" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # --- GENERUJANÁ METADATA PRO ZÁPIS ---
-          echo "### 📤 Metadata připravená k zápisu na Docker Hub" >> $GITHUB_STEP_SUMMARY
-          echo "**Sestavené Docker Tagy:**" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          
-          echo "**Vygenerované Docker Label: **" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.meta.outputs.labels }}" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-          echo "**Kompletní JSON metadata z \`docker/metadata-action\`:**" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
-          echo '${{ steps.meta.outputs.json }}' | jq . >> $GITHUB_STEP_SUMMARY || echo '${{ steps.meta.outputs.json }}' >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-      # 6. Build Docker image a nahrání (Push) do Docker Hubu
+      # 6. Build a push do Docker Hubu
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -98,13 +64,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage:1.0.0
-            ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage:1.0
-            ${{ secrets.DOCKERHUB_USERNAME }}/shoppinglistappimage:latest
