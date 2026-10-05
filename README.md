@@ -23,5 +23,7 @@ git push origin v0.0.12 (takto posílám jen tag)
 dockerhub akce provede build a pošle image do repository - pokud je s verzí tak se po pushi automatick naleje
 pokud je to build bez verze tak se musí nalít přes action ručním spuštěním a shaXXX buildu se propíše jako verze
 
+následně provede pull dané image na vps serveru netcup a její spuštění
+
 - autentikace přes google
 - data ze suprabase
