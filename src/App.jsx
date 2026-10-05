@@ -4,7 +4,7 @@ function App() {
   return (
     <main className="app-container">
       <h1>Hello World</h1>
-      <p>React aplikace je připravena a poběží na NetCup..v0.0.19</p>
+      <p>React aplikace je připravena a poběží na NetCup..v0.0.20</p>
       <VersionInfo />
     </main>
   );
