@@ -5,7 +5,7 @@ export default function VersionInfo() {
 
   return (
     <small>
-      v{version} {commit} {buildDate}
+      v{version} . {commit} . {buildDate}
     </small>
   );
 }
