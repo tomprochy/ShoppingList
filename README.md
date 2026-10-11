@@ -9,13 +9,10 @@ Push s verzí (v1.0.0) se deployuje automaticky a přidává číslo verze+lates
 
 Jak doručit push i s tagem na GHB:
 
-git add .
-
-git commit -m "Průlomová funkce"
-
-git tag -a v1.0.0 -m "Verze 1.0.0"
-
-git push origin master --follow-tags
+- git add .
+- git commit -m "Průlomová funkce"
+- git tag -a v1.0.0 -m "Verze 1.0.0"
+- git push origin master --follow-tags
 
 případně se dá poslat tag extra (ale řádky výše by měly stačit):
 a)
