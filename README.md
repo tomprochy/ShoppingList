@@ -15,10 +15,8 @@ Jak doručit push i s tagem na GHB:
 - git push origin master --follow-tags
 
 případně se dá poslat tag extra (ale řádky výše by měly stačit):
-a)
-git push origin master v0.0.12 (takto i se všemi commity které nejsou v syncu)
-b)
-git push origin v0.0.12 (takto posílám jen tag)
+- git push origin master v0.0.12 (takto i se všemi commity které nejsou v syncu)
+- git push origin v0.0.12 (takto posílám jen tag)
 
 dockerhub akce provede build a pošle image do repository - pokud je s verzí tak se po pushi automatick naleje
 pokud je to build bez verze tak se musí nalít přes action ručním spuštěním a shaXXX buildu se propíše jako verze
